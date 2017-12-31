@@ -1,0 +1,18 @@
+[
+	{
+		"attributes": {
+			"bold": true,
+			"italic": true
+		},
+		"insert": "bbii "
+	},
+	{
+		"attributes": {
+			"italic": true
+		},
+		"insert": "ii"
+	},
+	{
+		"insert": "\n"
+	}
+]

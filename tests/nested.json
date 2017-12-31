@@ -1,0 +1,36 @@
+[
+	{
+		"insert": "plain "
+	},
+	{
+		"attributes": {
+			"italic": true
+		},
+		"insert": "italic "
+	},
+	{
+		"attributes": {
+			"italic": true,
+			"bold": true
+		},
+		"insert": "italic-bold "
+	},
+	{
+		"attributes": {
+			"underline": true,
+			"italic": true,
+			"bold": true
+		},
+		"insert": "italic-bold-under "
+	},
+	{
+		"attributes": {
+			"underline": true,
+			"italic": true
+		},
+		"insert": "italic-under"
+	},
+	{
+		"insert": "\n"
+	}
+]

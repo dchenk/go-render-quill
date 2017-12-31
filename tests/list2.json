@@ -1,0 +1,33 @@
+[
+	{
+		"insert": "text\na"
+	},
+	{
+		"attributes": {
+			"list": "bullet"
+		},
+		"insert": "\n"
+	},
+	{
+		"insert": "b"
+	},
+	{
+		"attributes": {
+			"align": "center",
+			"list": "bullet"
+		},
+		"insert": "\n"
+	},
+	{
+		"insert": "c"
+	},
+	{
+		"attributes": {
+			"list": "bullet"
+		},
+		"insert": "\n"
+	},
+	{
+		"insert": "more plain text\n"
+	}
+]

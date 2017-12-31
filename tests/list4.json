@@ -1,0 +1,107 @@
+[
+	{
+		"insert": "1(ol)-1"
+	},
+	{
+		"attributes": {
+			"list": "ordered"
+		},
+		"insert": "\n"
+	},
+	{
+		"insert": "1(ol)-2 "
+	},
+	{
+		"attributes": {
+			"bold": true
+		},
+		"insert": "bold"
+	},
+	{
+		"attributes": {
+			"list": "ordered"
+		},
+		"insert": "\n"
+	},
+	{
+		"insert": "1(ul)-3 "
+	},
+	{
+		"attributes": {
+			"italic": true
+		},
+		"insert": "italic"
+	},
+	{
+		"attributes": {
+			"list": "bullet"
+		},
+		"insert": "\n"
+	},
+	{
+		"insert": "1(ol)-4"
+	},
+	{
+		"attributes": {
+			"list": "ordered"
+		},
+		"insert": "\n"
+	},
+	{
+		"attributes": {
+			"underline": true,
+			"italic": true
+		},
+		"insert": "under-ital"
+	},
+	{
+		"insert": "_before 2(ol)-1"
+	},
+	{
+		"attributes": {
+			"indent": 1,
+			"list": "ordered"
+		},
+		"insert": "\n"
+	},
+	{
+		"insert": "3(ol)-1"
+	},
+	{
+		"attributes": {
+			"indent": 2,
+			"list": "ordered"
+		},
+		"insert": "\n"
+	},
+	{
+		"insert": "3(ol)-2"
+	},
+	{
+		"attributes": {
+			"indent": 2,
+			"list": "ordered"
+		},
+		"insert": "\n"
+	},
+	{
+		"insert": "3(ul)-3"
+	},
+	{
+		"attributes": {
+			"indent": 2,
+			"list": "bullet"
+		},
+		"insert": "\n"
+	},
+	{
+		"insert": "2(ul)-2"
+	},
+	{
+		"attributes": {
+			"indent": 1,
+			"list": "bullet"
+		},
+		"insert": "\n"
+	}
+]

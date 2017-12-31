@@ -1,0 +1,26 @@
+[
+	{
+		"insert": "text\nitem1"
+	},
+	{
+		"attributes": {
+			"list": "ordered"
+		},
+		"insert": "\n"
+	},
+	{
+		"attributes": {
+			"bold": true
+		},
+		"insert": "item2 bold"
+	},
+	{
+		"attributes": {
+			"list": "ordered"
+		},
+		"insert": "\n"
+	},
+	{
+		"insert": "more text\n"
+	}
+]

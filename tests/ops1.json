@@ -1,87 +1,82 @@
 [
-    {
-        "insert": "Heading1"
-    },
-    {
-        "attributes": {
-            "header": 1
-        },
-        "insert": "\n"
-    },
-    {
-        "insert": "Hello, this is text.\nAnd "
-    },
-    {
-        "attributes": {
-            "italic": true
-        },
-        "insert": "here is italic "
-    },
-    {
-        "insert": "(and not).\nAnd "
-    },
-    {
-        "attributes": {
-            "bold": true
-        },
-        "insert": "here is bold"
-    },
-    {
-        "insert": " text.\nBlock quote"
-    },
-    {
-        "attributes": {
-            "blockquote": true
-        },
-        "insert": "\n"
-    },
-    {
-        "insert": "Heading2"
-    },
-    {
-        "attributes": {
-            "header": 2
-        },
-        "insert": "\n"
-    },
-    {
-        "insert": "More text...\n"
-    },
-    {
-        "attributes": {
-            "bold": true
-        },
-        "insert": "Bold"
-    },
-    {
-        "insert": " and "
-    },
-    {
-        "attributes": {
-            "italic": true
-        },
-        "insert": "italic"
-    },
-    {
-        "insert": "\n"
-    },
-    {
-        "attributes": {
-            "link": "widerwebs.com"
-        },
-        "insert": "A link"
-    },
-    {
-        "insert": "\n"
-    },
-    {
-        "attributes": {
-            "italic": true,
-            "link": "https://widerwebs.com"
-        },
-        "insert": "A link italic"
-    },
-    {
-        "insert": "\n"
-    }
+	{
+		"insert": "Heading1"
+	},
+	{
+		"attributes": {
+			"header": 1
+		},
+		"insert": "\n"
+	},
+	{
+		"insert": "Some plain text.\nHeading2"
+	},
+	{
+		"attributes": {
+			"header": 2
+		},
+		"insert": "\n"
+	},
+	{
+		"insert": "And "
+	},
+	{
+		"attributes": {
+			"italic": true
+		},
+		"insert": "here is italic "
+	},
+	{
+		"insert": "(and not).\nAnd "
+	},
+	{
+		"attributes": {
+			"bold": true
+		},
+		"insert": "here is bold"
+	},
+	{
+		"insert": " text.\nSome "
+	},
+	{
+		"attributes": {
+			"italic": true
+		},
+		"insert": "italic and "
+	},
+	{
+		"attributes": {
+			"italic": true,
+			"bold": true
+		},
+		"insert": "bold italic"
+	},
+	{
+		"insert": "\nBlock quote"
+	},
+	{
+		"attributes": {
+			"blockquote": true
+		},
+		"insert": "\n"
+	},
+	{
+		"attributes": {
+			"link": "https://widerwebs.com"
+		},
+		"insert": "A link"
+	},
+	{
+		"insert": "\n"
+	},
+	{
+		"attributes": {
+			"italic": true,
+			"link": "https://widerwebs.com"
+		},
+		"insert": "A link italic"
+	},
+	{
+		"insert": "\n"
+	}
 ]

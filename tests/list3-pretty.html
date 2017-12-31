@@ -1,0 +1,33 @@
+<!-- How Quill.js does it: -->
+<p>text</p>
+<ul>
+    <li>level1-1</li>
+    <li>level1-2</li>
+    <li class="indent-1">level2-1</li>
+    <li class="indent-1">level2-2</li>
+</ul>
+<ol>
+    <li class="indent-1">level2(ol)-1</li>
+</ol>
+<ul>
+    <li>level1-3</li>
+</ul>
+
+<!-- Another (better) way to do it: -->
+<p>text</p>
+<ul>
+    <li>level1-1</li>
+    <li>level1-2</li>
+    <li>
+        <ul>
+            <li>level2-1</li>
+            <li>level2-2</li>
+        </ul>
+    </li>
+    <li>
+        <ol>
+            <li>level2(ol)-1</li>
+        </ol>
+    </li>
+    <li>level1-3</li>
+</ul>

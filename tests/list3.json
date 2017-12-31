@@ -1,0 +1,59 @@
+[
+	{
+		"insert": "text\nlevel1-1"
+	},
+	{
+		"attributes": {
+			"list": "bullet"
+		},
+		"insert": "\n"
+	},
+	{
+		"insert": "level1-2"
+	},
+	{
+		"attributes": {
+			"list": "bullet"
+		},
+		"insert": "\n"
+	},
+	{
+		"insert": "level2-1"
+	},
+	{
+		"attributes": {
+			"indent": 1,
+			"list": "bullet"
+		},
+		"insert": "\n"
+	},
+	{
+		"insert": "level2-2"
+	},
+	{
+		"attributes": {
+			"indent": 1,
+			"list": "bullet"
+		},
+		"insert": "\n"
+	},
+	{
+		"insert": "level2(ol)-1"
+	},
+	{
+		"attributes": {
+			"indent": 1,
+			"list": "ordered"
+		},
+		"insert": "\n"
+	},
+	{
+		"insert": "level1-3"
+	},
+	{
+		"attributes": {
+			"list": "bullet"
+		},
+		"insert": "\n"
+	}
+]
