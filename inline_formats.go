@@ -109,3 +109,33 @@ func (imf *imageFormat) Write(buf io.Writer) {
 	buf.Write([]byte{'>'})
 
 }
+
+// strikethrough
+type strikeFormat struct{}
+
+func (*strikeFormat) Fmt() *Format {
+	return &Format{
+		Val:   "s",
+		Place: Tag,
+	}
+}
+
+func (*strikeFormat) HasFormat(o *Op) bool {
+	return o.HasAttr("strike")
+}
+
+// background
+type bkgFormat struct {
+	c string
+}
+
+func (bf *bkgFormat) Fmt() *Format {
+	return &Format{
+		Val:   "background-color:" + bf.c + ";",
+		Place: Style,
+	}
+}
+
+func (*bkgFormat) HasFormat(o *Op) bool {
+	return o.HasAttr("background")
+}

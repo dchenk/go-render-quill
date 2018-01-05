@@ -1,4 +1,4 @@
-// Package `quill` takes a Quill-based Delta (https://github.com/quilljs/delta) as a JSON array of `insert` operations
+// Package quill takes a Quill-based Delta (https://github.com/quilljs/delta) as a JSON array of `insert` operations
 // and renders the defined HTML document.
 //
 // This library is designed to be easily extendable. Simply call RenderExtended with a function that may provide its
@@ -354,6 +354,12 @@ func (o *Op) getFormatter(keyword string, customFormats func(string, *Op) Format
 		return &indentFormat{
 			in: o.Attrs["indent"],
 		}
+	case "strike":
+		return new(strikeFormat)
+	case "background":
+		return &bkgFormat{
+			c: o.Attrs["background"],
+		}
 	}
 
 	return nil
@@ -375,7 +381,7 @@ type Formatter interface {
 	HasFormat(*Op) bool // Say if the Op has the Format that Fmt returns.
 }
 
-// A Formatter may also be a FormatWriter if it wishes to write the body of the Op in some custom way (useful for embeds).
+// A FormatWriter can write the body of an Op in a custom way (useful for embeds).
 type FormatWriter interface {
 	Formatter
 	Write(io.Writer) // Write the entire body of the element.
