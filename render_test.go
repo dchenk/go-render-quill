@@ -48,7 +48,7 @@ func TestSimple(t *testing.T) {
 
 func TestRender(t *testing.T) {
 
-	pairNames := []string{"ops1", "nested", "ordering", "list1", "list2", "list3", "list4"}
+	pairNames := []string{"ops1", "nested", "ordering", "list1", "list2", "list3", "list4", "indent"}
 
 	for _, n := range pairNames {
 		if err := testPair(n+".json", n+".html"); err != nil {

@@ -1,0 +1,38 @@
+[
+	{
+		"insert": "text\nindented once"
+	},
+	{
+		"attributes": {
+			"indent": 1
+		},
+		"insert": "\n"
+	},
+	{
+		"insert": "another line indented once"
+	},
+	{
+		"attributes": {
+			"indent": 1
+		},
+		"insert": "\n"
+	},
+	{
+		"insert": "indented twice"
+	},
+	{
+		"attributes": {
+			"indent": 2
+		},
+		"insert": "\n"
+	},
+	{
+		"insert": "once again"
+	},
+	{
+		"attributes": {
+			"indent": 1
+		},
+		"insert": "\n"
+	}
+]
