@@ -30,6 +30,7 @@ fmt.Println(string(html))
  - Italic
  - Link
  - Strikethrough
+ - Superscript/Subscript
  - Underline
 
 ### Block

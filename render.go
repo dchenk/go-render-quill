@@ -360,6 +360,14 @@ func (o *Op) getFormatter(keyword string, customFormats func(string, *Op) Format
 		return &bkgFormat{
 			c: o.Attrs["background"],
 		}
+	case "script":
+		sf := new(scriptFormat)
+		if o.Attrs["script"] == "super" {
+			sf.t = "sup"
+		} else {
+			sf.t = "sub"
+		}
+		return sf
 	}
 
 	return nil

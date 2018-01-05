@@ -139,3 +139,20 @@ func (bf *bkgFormat) Fmt() *Format {
 func (*bkgFormat) HasFormat(o *Op) bool {
 	return o.HasAttr("background")
 }
+
+// script (sup and sub)
+
+type scriptFormat struct {
+	t string
+}
+
+func (sf *scriptFormat) Fmt() *Format {
+	return &Format{
+		Val:   sf.t,
+		Place: Tag,
+	}
+}
+
+func (*scriptFormat) HasFormat(o *Op) bool {
+	return o.HasAttr("script")
+}

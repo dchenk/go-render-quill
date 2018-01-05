@@ -21,6 +21,8 @@ func TestSimple(t *testing.T) {
 		`[{"insert":"text "},{"insert":{"image":"source-url"}},{"insert":" more text\n"}]`,                               // image
 		`[{"insert":"abc "},{"attributes":{"background":"#66a3e0"},"insert":"colored"},{"insert":" plain\n"}]`,           // background
 		`[{"attributes":{"underline":true},"insert":"underlined"},{"insert":"\n"}]`,                                      // underlined
+		`[{"insert":"plain"},{"attributes":{"script":"super"},"insert":"super"},{"insert":"\n"}]`,                        // superscript
+		`[{"insert":"plain"},{"attributes":{"script":"sub"},"insert":"sub"},{"insert":"\n"}]`,                            // subscript
 	}
 
 	want := []string{
@@ -35,6 +37,8 @@ func TestSimple(t *testing.T) {
 		`<p>text <img src="source-url"> more text</p>`,
 		`<p>abc <span style="background-color:#66a3e0;">colored</span> plain</p>`,
 		"<p><u>underlined</u></p>",
+		"<p>plain<sup>super</sup></p>",
+		"<p>plain<sub>sub</sub></p>",
 	}
 
 	for i := range cases {
