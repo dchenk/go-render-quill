@@ -136,8 +136,8 @@ func (bf *bkgFormat) Fmt() *Format {
 	}
 }
 
-func (*bkgFormat) HasFormat(o *Op) bool {
-	return o.HasAttr("background")
+func (bf *bkgFormat) HasFormat(o *Op) bool {
+	return o.Attrs["background"] == bf.c
 }
 
 // script (sup and sub)

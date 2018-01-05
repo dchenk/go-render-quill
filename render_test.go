@@ -2,7 +2,6 @@ package quill
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"testing"
 )
@@ -61,28 +60,28 @@ func TestRender(t *testing.T) {
 	pairNames := []string{"ops1", "nested", "ordering", "list1", "list2", "list3", "list4", "indent"}
 
 	for _, n := range pairNames {
-		if err := testPair(n+".json", n+".html"); err != nil {
-			t.Errorf("(name: %s) %s", n, err)
+
+		ops, err := ioutil.ReadFile("./tests/" + n + ".json")
+		if err != nil {
+			t.Errorf("could not read %s.json; %s", n, err)
+			t.FailNow()
 		}
+
+		html, err := ioutil.ReadFile("./tests/" + n + ".html")
+		if err != nil {
+			t.Errorf("could not read %s.html; %s", n, err)
+			t.FailNow()
+		}
+
+		got, err := Render(ops)
+		if err != nil {
+			t.Errorf("error rendering; %s", err)
+		}
+
+		if !bytes.Equal(html, got) {
+			t.Errorf("bad rendering (name: %s):\nwanted: \n%s\ngot: \n%s", n, html, got)
+		}
+
 	}
 
-}
-
-func testPair(opsFile, htmlFile string) error {
-	ops, err := ioutil.ReadFile("./tests/" + opsFile)
-	if err != nil {
-		return fmt.Errorf("could not read %s; %s", opsFile, err)
-	}
-	html, err := ioutil.ReadFile("./tests/" + htmlFile)
-	if err != nil {
-		return fmt.Errorf("could not read %s; %s", htmlFile, err)
-	}
-	got, err := Render(ops)
-	if err != nil {
-		return fmt.Errorf("error rendering; %s", err)
-	}
-	if !bytes.Equal(html, got) {
-		return fmt.Errorf("bad rendering; \nwanted: \n%s\ngot: \n%s", html, got)
-	}
-	return nil
 }

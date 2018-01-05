@@ -90,29 +90,37 @@ func TestFormatState_add(t *testing.T) {
 
 func TestFormatState_closePrevious(t *testing.T) {
 
-	o := &Op{
-		Data: "stuff",
-		Type: "text",
-		// no attributes set
-	}
+	o1 := blankOp()
+	o1.Attrs["italic"] = "y"
+	o1.Attrs["bold"] = "y"
+
+	o2 := blankOp()
+	o2.Attrs["background"] = "#e0e0e0"
+	o2.Attrs["italic"] = "y"
 
 	cases := []formatState{
 		{[]*Format{
-			{"em", Tag, false, false, "", "", o.getFormatter("italic", nil)},
-			{"strong", Tag, false, false, "", "", o.getFormatter("bold", nil)},
+			{"em", Tag, false, false, "", "", o1.getFormatter("italic", nil)},
+			{"strong", Tag, false, false, "", "", o1.getFormatter("bold", nil)},
+		}},
+		{[]*Format{
+			{"background-color:#e0e0e0;", Style, false, false, "", "", o2.getFormatter("background", nil)},
+			{"em", Tag, false, false, "", "", o2.getFormatter("italic", nil)},
 		}},
 	}
 
-	want := []string{"</strong></em>", "</strong></li></ul>"}
+	want := []string{"</strong></em>", "</em></span>"}
 
 	buf := new(bytes.Buffer)
 
 	for i := range cases {
 
+		o := blankOp()
+
 		cases[i].closePrevious(buf, o, false)
 		got := buf.String()
-		if got != want[i] {
-			t.Errorf("closed formats wrong (index %d); wanted %q; got %q\n", i, want[i], got)
+		if got != want[i] || len(cases[i].open) != 0 {
+			t.Errorf("closed formats wrong (index %d); wanted %q; got %q", i, want[i], got)
 		}
 
 		buf.Reset()

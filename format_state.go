@@ -54,7 +54,7 @@ func (fs *formatState) closePrevious(buf *bytes.Buffer, o *Op, doingBlock bool) 
 
 }
 
-// pop removes the last format state from the list of open states.
+// pop removes the last format from the state of currently open formats.
 func (fs *formatState) pop(buf *bytes.Buffer) {
 	indx := len(fs.open) - 1
 	if fs.open[indx].wrap {
