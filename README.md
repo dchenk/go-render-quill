@@ -39,6 +39,7 @@ fmt.Println(string(html))
  - Indent
  - List (ul and ol, including nested lists)
  - Text alignment
+ - Code block
 
 ### Embeds
  - Image (an inline format)

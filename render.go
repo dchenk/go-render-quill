@@ -62,44 +62,27 @@ func RenderExtended(ops []byte, customFormats func(string, *Op) Formatter) (html
 		// Open the a block element, write its body, and close it to move on only when the ending "\n" of the block is reached.
 		if strings.IndexByte(o.Data, '\n') != -1 {
 
-			if o.Data == "\n" { // Write a block element and flush the temporary buffer.
+			// Extract text from between the block-terminating line feeds and write each part as its own Op.
+			split := strings.Split(o.Data, "\n")
 
-				// Avoid empty paragraphs and "\n" in the output.
-				if tempBuf.Len() == 0 {
-					o.Data = "<br>"
-				} else {
-					o.Data = ""
-				}
+			for i := range split {
 
-				o.writeBlock(fs, tempBuf, finalBuf, fms)
+				o.Data = split[i]
 
-			} else { // Extract the block-terminating line feeds and write each part as its own Op.
+				// If the current o.Data still has an "\n" following (its not the last in split), then it ends a block.
+				if i < len(split)-1 {
 
-				split := strings.Split(o.Data, "\n")
+					o.writeBlock(fs, tempBuf, finalBuf, fms)
 
-				for i := range split {
+				} else if o.Data != "" { // If the last element in split is just "" then the last character in the rawOp is "\n".
 
-					o.Data = split[i]
-
-					// If the current o.Data still has an "\n" following (its not the last in split), then it ends a block.
-					if i < len(split)-1 {
-
-						// Avoid having empty paragraphs.
-						if tempBuf.Len() == 0 && o.Data == "" {
-							o.Data = "<br>"
-						}
-
-						o.writeBlock(fs, tempBuf, finalBuf, fms)
-
-					} else if o.Data != "" { // If the last element in split is just "" then the last character in the rawOp is "\n".
-						o.writeInline(fs, tempBuf, fms)
-					}
+					o.writeInline(fs, tempBuf, fms)
 
 				}
 
 			}
 
-		} else { // We are just adding stuff inline.
+		} else {
 			o.writeInline(fs, tempBuf, fms)
 		}
 
@@ -154,19 +137,6 @@ type Op struct {
 func (o *Op) writeBlock(fs *formatState, tempBuf *bytes.Buffer, finalBuf *bytes.Buffer, newFms []*Format) {
 
 	// Close the inline formats opened within the block to the tempBuf and block formats of wrappers to finalBuf.
-	//wrapFs := &formatState{make([]*Format, 0, 2)}
-	//inlineFs := &formatState{make([]*Format, 0, 2)}
-	//for i := range fs.open {
-	//	if fs.open[i].wrap {
-	//		wrapFs.add(fs.open[i])
-	//	} else {
-	//		inlineFs.add(fs.open[i])
-	//	}
-	//}
-	//wrapFs.closePrevious(finalBuf, o, true)
-	//inlineFs.closePrevious(tempBuf, o, true)
-	//fs.open = append(wrapFs.open, inlineFs.open...) // There may be something left open.
-	//fs.closePrevious(tempBuf, o, true)
 	closedTemp := &formatState{}
 
 	for i := len(fs.open) - 1; i >= 0; i-- { // Start with the last format opened.
@@ -208,11 +178,6 @@ func (o *Op) writeBlock(fs *formatState, tempBuf *bytes.Buffer, finalBuf *bytes.
 		style   string
 	}
 
-	// At least a format from the Op.Type should be set.
-	if len(newFms) == 0 {
-		return
-	}
-
 	// Merge all formats into a single tag.
 	for i := range newFms {
 		fm := newFms[i]
@@ -222,9 +187,7 @@ func (o *Op) writeBlock(fs *formatState, tempBuf *bytes.Buffer, finalBuf *bytes.
 			switch fm.Place {
 			case Tag:
 				// If an opening tag is not specified by the Op insert type, it may be specified by an attribute.
-				if v != "" {
-					block.tagName = v // Override whatever value is set.
-				}
+				block.tagName = v // Override whatever value is set.
 			case Class:
 				block.classes = append(block.classes, v)
 			case Style:
@@ -237,6 +200,11 @@ func (o *Op) writeBlock(fs *formatState, tempBuf *bytes.Buffer, finalBuf *bytes.
 			fs.add(fm)
 			finalBuf.WriteString(fm.Val)
 		}
+	}
+
+	// Avoid empty paragraphs and "\n" in the output for text blocks.
+	if o.Data == "" && block.tagName == "p" && tempBuf.Len() == 0 {
+		o.Data = "<br>"
 	}
 
 	if block.tagName != "" {
@@ -257,9 +225,6 @@ func (o *Op) writeBlock(fs *formatState, tempBuf *bytes.Buffer, finalBuf *bytes.
 	if block.tagName != "" {
 		closeTag(finalBuf, block.tagName)
 	}
-
-	// Write out the closes by FormatWrapper formats, starting from the last written.
-	//fs.closePrevious(finalBuf, o, true)
 
 	tempBuf.Reset()
 
@@ -368,6 +333,8 @@ func (o *Op) getFormatter(keyword string, customFormats func(string, *Op) Format
 			sf.t = "sub"
 		}
 		return sf
+	case "code-block":
+		return &codeBlockFormat{o}
 	}
 
 	return nil

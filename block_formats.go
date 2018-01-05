@@ -149,3 +149,48 @@ func (inf *indentFormat) Fmt() *Format {
 func (inf *indentFormat) HasFormat(o *Op) bool {
 	return o.Attrs["indent"] == inf.in
 }
+
+// code block
+type codeBlockFormat struct {
+	o *Op
+}
+
+func (cf *codeBlockFormat) Fmt() *Format {
+	return &Format{
+		Place: Tag,
+		Block: true,
+	}
+}
+
+func (cf *codeBlockFormat) HasFormat(o *Op) bool {
+	return false // Only a wrapper.
+}
+
+// codeBlockFormat implements the FormatWrapper interface.
+func (*codeBlockFormat) Wrap() (string, string) {
+	return "<pre>", "\n</pre>"
+}
+
+// codeBlockFormat implements the FormatWrapper interface.
+func (*codeBlockFormat) Open(open []*Format, _ *Op) bool {
+	// If there is a code block already open, no need to open another.
+	for i := range open {
+		if open[i].Place == Tag && open[i].Val == "<pre>" {
+			return false
+		}
+	}
+	return true
+}
+
+// codeBlockFormat implements the FormatWrapper interface.
+func (cf *codeBlockFormat) Close(_ []*Format, o *Op, doingBlock bool) bool {
+	if doingBlock && !o.HasAttr("code-block") {
+		return true
+	}
+	// We are simply adding another line to the code block. The previous line should end with
+	// a "\n" though all instances of "\n" are stripped out by the split from the start.
+	if !doingBlock {
+		o.Data = "\n" + o.Data
+	}
+	return false
+}

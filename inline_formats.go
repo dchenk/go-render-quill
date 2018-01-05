@@ -71,7 +71,7 @@ type linkFormat struct {
 func (*linkFormat) Fmt() *Format { return new(Format) } // Only a wrapper.
 
 func (lf *linkFormat) HasFormat(*Op) bool {
-	return false
+	return false // Only a wrapper.
 }
 
 func (lf *linkFormat) Wrap() (string, string) {

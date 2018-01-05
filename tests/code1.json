@@ -1,0 +1,29 @@
+[
+	{
+		"insert": "some code"
+	},
+	{
+		"attributes": {
+			"code-block": true
+		},
+		"insert": "\n"
+	},
+	{
+		"insert": "  and more"
+	},
+	{
+		"attributes": {
+			"code-block": true
+		},
+		"insert": "\n"
+	},
+	{
+		"insert": "plain text\nmore code"
+	},
+	{
+		"attributes": {
+			"code-block": true
+		},
+		"insert": "\n"
+	}
+]
