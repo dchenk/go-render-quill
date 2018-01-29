@@ -61,13 +61,13 @@ func TestRender(t *testing.T) {
 
 	for _, n := range pairNames {
 
-		ops, err := ioutil.ReadFile("./tests/" + n + ".json")
+		ops, err := ioutil.ReadFile("./testdata/" + n + ".json")
 		if err != nil {
 			t.Errorf("could not read %s.json; %s", n, err)
 			t.FailNow()
 		}
 
-		html, err := ioutil.ReadFile("./tests/" + n + ".html")
+		html, err := ioutil.ReadFile("./testdata/" + n + ".html")
 		if err != nil {
 			t.Errorf("could not read %s.html; %s", n, err)
 			t.FailNow()
@@ -84,4 +84,19 @@ func TestRender(t *testing.T) {
 
 	}
 
+}
+
+func BenchmarkRender_ops1(b *testing.B) {
+	bts, err := ioutil.ReadFile("./testdata/ops1.json")
+	if err != nil {
+		b.Fatalf("could not read ops file: %s", err)
+	}
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		bts, err := Render(bts)
+		if err != nil {
+			b.Errorf("error rendering: %s", err)
+		}
+		_ = bts
+	}
 }
