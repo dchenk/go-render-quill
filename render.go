@@ -21,106 +21,110 @@ func Render(ops []byte) ([]byte, error) {
 }
 
 // RenderExtended takes a Delta array of insert operations and, optionally, a function that may provide a Formatter to
-// customize the way certain kinds of inserts are rendered. If the given Formatter is nil, then the default one that is
-// built in is used. If an error occurs while rendering, any HTML already rendered is returned.
-func RenderExtended(ops []byte, customFormats func(string, *Op) Formatter) (html []byte, err error) {
+// customize the way certain kinds of inserts are rendered, and returns the rendered HTML. If the given Formatter is nil,
+// then the default one that is built in is used. If an error occurs while rendering, any HTML already rendered is returned.
+func RenderExtended(ops []byte, customFormats func(string, *Op) Formatter) ([]byte, error) {
 
 	var raw []rawOp
-	if err = json.Unmarshal(ops, &raw); err != nil {
+	if err := json.Unmarshal(ops, &raw); err != nil {
 		return nil, err
 	}
 
-	var (
-		finalBuf = new(bytes.Buffer)     // the final output
-		tempBuf  = new(bytes.Buffer)     // temporary buffer reused for each block element
-		fs       = new(formatState)      // the tags currently open in the order in which they were opened
-		o        = new(Op)               // allocate memory for an Op to reuse for all iterations
-		fms      = make([]*Format, 0, 4) // the Formatter types defined for each Op
-	)
-	o.Attrs = make(map[string]string, 3) // initialize once here only
+	vars := renderVars{
+		o:   Op{Attrs: make(map[string]string, 3)},
+		fms: make([]*Format, 0, 4),
+	}
 
 	for i := range raw {
 
-		if err = raw[i].makeOp(o); err != nil {
-			return finalBuf.Bytes(), err
+		if err := raw[i].makeOp(&vars.o); err != nil {
+			return vars.finalBuf.Bytes(), err
 		}
 
-		fms = fms[:0] // Reset the slice for the current Op iteration.
+		vars.fms = vars.fms[:0] // Reset the slice for the current Op iteration.
 
 		// To set up fms, first check the Op insert type.
-		typeFmTer := o.getFormatter(o.Type, customFormats)
+		typeFmTer := vars.o.getFormatter(vars.o.Type, customFormats)
 		if typeFmTer == nil {
-			return finalBuf.Bytes(), fmt.Errorf("an op does not have a format defined for its type: %v", raw[i])
+			return vars.finalBuf.Bytes(), fmt.Errorf("quill: an op does not have a format defined for its type: %v", raw[i])
 		}
-		fms = o.addFmTer(fms, typeFmTer, fs, tempBuf)
+		vars.o.addFmTer(&vars, typeFmTer)
 
 		// Get a Formatter out of each of the attributes.
-		for attr := range o.Attrs {
-			fms = o.addFmTer(fms, o.getFormatter(attr, customFormats), fs, tempBuf)
+		for attr := range vars.o.Attrs {
+			vars.o.addFmTer(&vars, vars.o.getFormatter(attr, customFormats))
 		}
 
 		// Open the a block element, write its body, and close it to move on only when the ending "\n" of the block is reached.
-		if strings.IndexByte(o.Data, '\n') != -1 {
+		if strings.IndexByte(vars.o.Data, '\n') != -1 {
 
 			// Extract text from between the block-terminating line feeds and write each part as its own Op.
-			split := strings.Split(o.Data, "\n")
+			split := strings.Split(vars.o.Data, "\n")
 
 			for i := range split {
 
-				o.Data = split[i]
+				vars.o.Data = split[i]
 
 				// If the current o.Data still has an "\n" following (its not the last in split), then it ends a block.
 				if i < len(split)-1 {
 
-					o.writeBlock(fs, tempBuf, finalBuf, fms)
+					vars.o.writeBlock(&vars)
 
-				} else if o.Data != "" { // If the last element in split is just "" then the last character in the rawOp is "\n".
+				} else if vars.o.Data != "" { // If the last element in split is just "" then the last character in the rawOp is "\n".
 
-					o.writeInline(fs, tempBuf, fms)
+					vars.o.writeInline(&vars)
 
 				}
 
 			}
 
 		} else {
-			o.writeInline(fs, tempBuf, fms)
+			vars.o.writeInline(&vars)
 		}
 
 	}
 
 	// Before writing out the final buffer, close the last remaining tags set by a FormatWrapper.
 	// The FormatWrapper should see that all styling is now done.
-	fs.closePrevious(finalBuf, blankOp(), true)
+	vars.fs.closePrevious(&vars.finalBuf, blankOp(), true)
 
-	html = finalBuf.Bytes()
-	return
+	return vars.finalBuf.Bytes(), nil
 
 }
 
+// renderVars combines the variables created in RenderExtended into a single allocation.
+type renderVars struct {
+	finalBuf bytes.Buffer // the final output
+	tempBuf  bytes.Buffer // temporary buffer reused for each block element
+	fs       formatState  // the tags currently open in the order in which they were opened
+	fms      []*Format
+	o        Op // an Op to reuse for all iterations
+}
+
 // addFmTer adds the format from fmTer to fms if the format is not already set on fs. All FormatWrapper formats are added regardless
-// of whether they are already set on fs.
-func (o *Op) addFmTer(fms []*Format, fmTer Formatter, fs *formatState, buf *bytes.Buffer) []*Format {
+// of whether they are already set on fs. Data is written to the temporary buffer only.
+func (o *Op) addFmTer(vars *renderVars, fmTer Formatter) {
 	if fmTer == nil {
-		return fms
+		return
 	}
 	fm := fmTer.Fmt()
 	if fm == nil {
 		// Check if the format is a FormatWriter. If it is, just write it out and continue.
 		if wr, ok := fmTer.(FormatWriter); ok {
-			wr.Write(buf)
+			wr.Write(&vars.tempBuf)
 			o.Data = ""
 		}
-		return fms
+		return
 	}
 	fm.fm = fmTer
 	if fw, ok := fmTer.(FormatWrapper); ok {
 		fm.wrap = true
 		fm.wrapPre, fm.wrapPost = fw.Wrap()
-		return append(fms, fm)
-	} else if !fs.hasSet(fmTer.Fmt()) {
-		return append(fms, fm)
+		vars.fms = append(vars.fms, fm)
+	} else if !vars.fs.hasSet(fmTer.Fmt()) {
+		vars.fms = append(vars.fms, fm)
 	}
-	return fms
+	return
 }
 
 // An Op is a Delta insert operations (https://github.com/quilljs/delta#insert) that has been converted into this format for
@@ -134,34 +138,34 @@ type Op struct {
 // writeBlock writes a block element (which may be nested inside another block element if it is a FormatWrapper).
 // The opening HTML tag of a block element is written to the main buffer only after the "\n" character terminating the
 // block is reached (the Op with the "\n" character holds the information about the block element).
-func (o *Op) writeBlock(fs *formatState, tempBuf *bytes.Buffer, finalBuf *bytes.Buffer, newFms []*Format) {
+func (o *Op) writeBlock(vars *renderVars) {
 
 	// Close the inline formats opened within the block to the tempBuf and block formats of wrappers to finalBuf.
-	closedTemp := &formatState{}
+	closedTemp := make(formatState, 0, 1)
 
-	for i := len(fs.open) - 1; i >= 0; i-- { // Start with the last format opened.
+	for i := len(vars.fs) - 1; i >= 0; i-- { // Start with the last format opened.
 
-		f := fs.open[i]
+		f := vars.fs[i]
 
 		// If this format is not set on the current Op, close it.
-		if (!f.wrap && !f.fm.HasFormat(o)) || (f.wrap && f.fm.(FormatWrapper).Close(fs.open, o, true)) {
+		if (!f.wrap && !f.fm.HasFormat(o)) || (f.wrap && f.fm.(FormatWrapper).Close(vars.fs, o, true)) {
 
 			// If we need to close a tag after which there are tags that should stay open, close the following tags for now.
-			if i < len(fs.open)-1 {
-				for ij := len(fs.open) - 1; ij > i; ij-- {
-					closedTemp.add(fs.open[ij])
+			if i < len(vars.fs)-1 {
+				for ij := len(vars.fs) - 1; ij > i; ij-- {
+					closedTemp.add(vars.fs[ij])
 					if f.wrap && f.Block {
-						fs.pop(finalBuf)
+						vars.fs.pop(&vars.finalBuf)
 					} else {
-						fs.pop(tempBuf)
+						vars.fs.pop(&vars.tempBuf)
 					}
 				}
 			}
 
 			if f.wrap && f.Block {
-				fs.pop(finalBuf)
+				vars.fs.pop(&vars.finalBuf)
 			} else {
-				fs.pop(tempBuf)
+				vars.fs.pop(&vars.tempBuf)
 			}
 
 		}
@@ -169,8 +173,8 @@ func (o *Op) writeBlock(fs *formatState, tempBuf *bytes.Buffer, finalBuf *bytes.
 	}
 
 	// Re-open the temporarily closed formats.
-	closedTemp.writeFormats(tempBuf)
-	fs.open = append(fs.open, closedTemp.open...) // Copy after the sorting.
+	closedTemp.writeFormats(&vars.tempBuf)
+	vars.fs = append(vars.fs, closedTemp...) // Copy after the sorting.
 
 	var block struct {
 		tagName string
@@ -179,8 +183,8 @@ func (o *Op) writeBlock(fs *formatState, tempBuf *bytes.Buffer, finalBuf *bytes.
 	}
 
 	// Merge all formats into a single tag.
-	for i := range newFms {
-		fm := newFms[i]
+	for i := range vars.fms {
+		fm := vars.fms[i]
 		// Apply only block-level formats.
 		if fm.Block {
 			v := fm.Val
@@ -195,54 +199,55 @@ func (o *Op) writeBlock(fs *formatState, tempBuf *bytes.Buffer, finalBuf *bytes.
 			}
 		}
 		// Write out all of FormatWrapper opening text (if there is any).
-		if fm.wrap && fm.fm.(FormatWrapper).Open(fs.open, o) {
+		if fm.wrap && fm.fm.(FormatWrapper).Open(vars.fs, o) {
 			fm.Val = fm.wrapPre
-			fs.add(fm)
-			finalBuf.WriteString(fm.Val)
+			vars.fs.add(fm)
+			vars.finalBuf.WriteString(fm.Val)
 		}
 	}
 
 	// Avoid empty paragraphs and "\n" in the output for text blocks.
-	if o.Data == "" && block.tagName == "p" && tempBuf.Len() == 0 {
+	if o.Data == "" && block.tagName == "p" && vars.tempBuf.Len() == 0 {
 		o.Data = "<br>"
 	}
 
 	if block.tagName != "" {
-		finalBuf.WriteByte('<')
-		finalBuf.WriteString(block.tagName)
-		finalBuf.WriteString(classesList(block.classes))
+		vars.finalBuf.WriteByte('<')
+		vars.finalBuf.WriteString(block.tagName)
+		vars.finalBuf.WriteString(classesList(block.classes))
 		if block.style != "" {
-			finalBuf.WriteString(" style=")
-			finalBuf.WriteString(strconv.Quote(block.style))
+			vars.finalBuf.WriteString(" style=")
+			vars.finalBuf.WriteString(strconv.Quote(block.style))
 		}
-		finalBuf.WriteByte('>')
+		vars.finalBuf.WriteByte('>')
 	}
 
-	finalBuf.Write(tempBuf.Bytes()) // Copy the temporary buffer to the final output.
+	vars.finalBuf.Write(vars.tempBuf.Bytes()) // Copy the temporary buffer to the final output.
 
-	finalBuf.WriteString(o.Data) // Copy the data of the current Op (usually just "<br>" or blank).
+	vars.finalBuf.WriteString(o.Data) // Copy the data of the current Op (usually just "<br>" or blank).
 
 	if block.tagName != "" {
-		closeTag(finalBuf, block.tagName)
+		closeTag(&vars.finalBuf, block.tagName)
 	}
 
-	tempBuf.Reset()
+	vars.tempBuf.Reset()
 
 }
 
-func (o *Op) writeInline(fs *formatState, buf *bytes.Buffer, newFms []*Format) {
+// writeInline writes to the temporary buffer.
+func (o *Op) writeInline(vars *renderVars) {
 
-	fs.closePrevious(buf, o, false)
+	vars.fs.closePrevious(&vars.tempBuf, o, false)
 
 	// Save the formats being written now separately from fs.
-	addNow := &formatState{make([]*Format, 0, len(newFms))}
+	addNow := make(formatState, 0, len(vars.fms))
 
-	for _, f := range newFms {
+	for _, f := range vars.fms {
 		// Apply only inline formats.
 		if !f.Block {
 			if f.wrap {
 				// Add FormatWrapper formats only if they need to be written now.
-				if f.fm.(FormatWrapper).Open(fs.open, o) {
+				if f.fm.(FormatWrapper).Open(vars.fs, o) {
 					f.Val = f.wrapPre
 					addNow.add(f)
 				}
@@ -252,10 +257,10 @@ func (o *Op) writeInline(fs *formatState, buf *bytes.Buffer, newFms []*Format) {
 		}
 	}
 
-	addNow.writeFormats(buf)
-	fs.open = append(fs.open, addNow.open...) // Copy after the sorting.
+	addNow.writeFormats(&vars.tempBuf)
+	vars.fs = append(vars.fs, addNow...) // Copy after the sorting.
 
-	buf.WriteString(o.Data)
+	vars.tempBuf.WriteString(o.Data)
 
 }
 

@@ -55,11 +55,11 @@ func TestFormatState_add(t *testing.T) {
 		},
 	}
 
-	fs := new(formatState) // reuse
+	fs := make(formatState, 0, 2) // reuse
 
 	for i, ca := range cases {
 
-		fs.open = ca.current
+		fs = ca.current
 
 		fmTer := ca.o.getFormatter(ca.keyword, nil)
 		fm := fmTer.Fmt()
@@ -67,20 +67,19 @@ func TestFormatState_add(t *testing.T) {
 
 		fs.add(fm)
 
-		if len(ca.want) != len(fs.open) {
-			t.Errorf("(index %d) unequal count of formats", i)
-			t.FailNow()
+		if len(ca.want) != len(fs) {
+			t.Fatalf("(index %d) unequal count of formats", i)
 		}
 
-		for j := range fs.open {
-			if ca.want[j].Val != fs.open[j].Val {
-				t.Errorf("did not add format Val correctly (index %d); got %q", i, fs.open[j].Val)
+		for j := range fs {
+			if ca.want[j].Val != fs[j].Val {
+				t.Errorf("did not add format Val correctly (index %d); got %q", i, fs[j].Val)
 			}
-			if ca.want[j].Place != fs.open[j].Place {
-				t.Errorf("did not add format Place correctly (index %d); got %v", i, fs.open[j].Place)
+			if ca.want[j].Place != fs[j].Place {
+				t.Errorf("did not add format Place correctly (index %d); got %v", i, fs[j].Place)
 			}
-			if ca.want[j].Block != fs.open[j].Block {
-				t.Errorf("did not add format Block correctly (index %d); got %v", i, fs.open[j].Block)
+			if ca.want[j].Block != fs[j].Block {
+				t.Errorf("did not add format Block correctly (index %d); got %v", i, fs[j].Block)
 			}
 		}
 
@@ -99,27 +98,27 @@ func TestFormatState_closePrevious(t *testing.T) {
 	o2.Attrs["italic"] = "y"
 
 	cases := []formatState{
-		{[]*Format{
+		{
 			{"em", Tag, false, false, "", "", o1.getFormatter("italic", nil)},
 			{"strong", Tag, false, false, "", "", o1.getFormatter("bold", nil)},
-		}},
-		{[]*Format{
+		},
+		{
 			{"background-color:#e0e0e0;", Style, false, false, "", "", o2.getFormatter("background", nil)},
 			{"em", Tag, false, false, "", "", o2.getFormatter("italic", nil)},
-		}},
+		},
 	}
 
 	want := []string{"</strong></em>", "</em></span>"}
 
-	buf := new(bytes.Buffer)
+	var buf bytes.Buffer
 
 	for i := range cases {
 
 		o := blankOp()
 
-		cases[i].closePrevious(buf, o, false)
+		cases[i].closePrevious(&buf, o, false)
 		got := buf.String()
-		if got != want[i] || len(cases[i].open) != 0 {
+		if got != want[i] || len(cases[i]) != 0 {
 			t.Errorf("closed formats wrong (index %d); wanted %q; got %q", i, want[i], got)
 		}
 
@@ -187,20 +186,20 @@ func TestFormatState_Sort(t *testing.T) {
 
 	for i := range cases {
 
-		fsCase := new(formatState)
+		fsCase := make(formatState, 0, 1)
 		for _, s := range cases[i] {
-			fsCase.open = append(fsCase.open, &Format{
+			fsCase = append(fsCase, &Format{
 				Val:   s.Val,
 				Place: s.Place,
 				fm:    o.getFormatter(s.keyword, nil),
 			})
 		}
 
-		sort.Sort(fsCase)
+		sort.Sort(&fsCase)
 
-		fsWant := new(formatState)
+		fsWant := make(formatState, 0, 1)
 		for _, s := range want[i] {
-			fsWant.open = append(fsWant.open, &Format{
+			fsWant = append(fsWant, &Format{
 				Val:   s.Val,
 				Place: s.Place,
 				fm:    o.getFormatter(s.keyword, nil),
@@ -208,17 +207,17 @@ func TestFormatState_Sort(t *testing.T) {
 		}
 
 		ok := true
-		for j := range fsCase.open {
-			if fsCase.open[j].Val != fsWant.open[j].Val {
+		for j := range fsCase {
+			if fsCase[j].Val != fsWant[j].Val {
 				ok = false
-			} else if fsCase.open[j].Place != fsWant.open[j].Place {
+			} else if fsCase[j].Place != fsWant[j].Place {
 				ok = false
 			}
 		}
 		if !ok {
 			t.Errorf("bad sorting (index %d); got:\n", i)
-			for k := range fsCase.open {
-				t.Errorf("  (%d) %+v\n", k, *fsCase.open[k])
+			for k := range fsCase {
+				t.Errorf("  (%d) %+v\n", k, fsCase[k])
 			}
 		}
 

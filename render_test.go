@@ -44,8 +44,7 @@ func TestSimple(t *testing.T) {
 
 		bts, err := Render([]byte(cases[i]))
 		if err != nil {
-			t.Errorf("%s", err)
-			t.FailNow()
+			t.Fatalf("%s", err)
 		}
 		if string(bts) != want[i] {
 			t.Errorf("bad rendering (index %d); got: %s", i, bts)
