@@ -62,14 +62,12 @@ func TestRender(t *testing.T) {
 
 		ops, err := ioutil.ReadFile("./testdata/" + n + ".json")
 		if err != nil {
-			t.Errorf("could not read %s.json; %s", n, err)
-			t.FailNow()
+			t.Fatalf("could not read %s.json; %s", n, err)
 		}
 
 		html, err := ioutil.ReadFile("./testdata/" + n + ".html")
 		if err != nil {
-			t.Errorf("could not read %s.html; %s", n, err)
-			t.FailNow()
+			t.Fatalf("could not read %s.html; %s", n, err)
 		}
 
 		got, err := Render(ops)

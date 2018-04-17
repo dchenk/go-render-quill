@@ -80,24 +80,24 @@ func (fs *formatState) writeFormats(buf *bytes.Buffer) {
 
 	sort.Sort(fs) // Ensure that the serialization is consistent even if attribute ordering in a map changes.
 
-	for i := range *fs {
+	for _, f := range *fs {
 
-		if (*fs)[i].wrap {
-			buf.WriteString((*fs)[i].Val) // The complete opening or closing wrap is given.
+		if f.wrap {
+			buf.WriteString(f.Val) // The complete opening or closing wrap is given.
 			continue
 		}
 
 		buf.WriteByte('<')
 
-		switch (*fs)[i].Place {
+		switch f.Place {
 		case Tag:
-			buf.WriteString((*fs)[i].Val)
+			buf.WriteString(f.Val)
 		case Class:
 			buf.WriteString("span class=")
-			buf.WriteString(strconv.Quote((*fs)[i].Val))
+			buf.WriteString(strconv.Quote(f.Val))
 		case Style:
 			buf.WriteString("span style=")
-			buf.WriteString(strconv.Quote((*fs)[i].Val))
+			buf.WriteString(strconv.Quote(f.Val))
 		}
 
 		buf.WriteByte('>')

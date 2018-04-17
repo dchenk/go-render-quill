@@ -76,8 +76,7 @@ func TestRawOp_makeOp(t *testing.T) {
 	for i := range rawOps {
 
 		if err := rawOps[i].makeOp(o); err != nil {
-			t.Errorf("error making Op: %s", err)
-			t.FailNow()
+			t.Fatalf("error making Op: %s", err)
 		}
 
 		if !reflect.DeepEqual(*o, want[i]) {

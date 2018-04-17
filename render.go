@@ -25,13 +25,14 @@ func Render(ops []byte) ([]byte, error) {
 // then the default one that is built in is used. If an error occurs while rendering, any HTML already rendered is returned.
 func RenderExtended(ops []byte, customFormats func(string, *Op) Formatter) ([]byte, error) {
 
-	var raw []rawOp
+	raw := make([]rawOp, 0, 12)
 	if err := json.Unmarshal(ops, &raw); err != nil {
 		return nil, err
 	}
 
 	vars := renderVars{
 		o:   Op{Attrs: make(map[string]string, 3)},
+		fs:  make(formatState, 0, 4),
 		fms: make([]*Format, 0, 4),
 	}
 
@@ -61,12 +62,12 @@ func RenderExtended(ops []byte, customFormats func(string, *Op) Formatter) ([]by
 			// Extract text from between the block-terminating line feeds and write each part as its own Op.
 			split := strings.Split(vars.o.Data, "\n")
 
-			for i := range split {
+			for j := range split {
 
-				vars.o.Data = split[i]
+				vars.o.Data = split[j]
 
 				// If the current o.Data still has an "\n" following (its not the last in split), then it ends a block.
-				if i < len(split)-1 {
+				if j < len(split)-1 {
 
 					vars.o.writeBlock(&vars)
 
@@ -97,12 +98,13 @@ type renderVars struct {
 	finalBuf bytes.Buffer // the final output
 	tempBuf  bytes.Buffer // temporary buffer reused for each block element
 	fs       formatState  // the tags currently open in the order in which they were opened
-	fms      []*Format
-	o        Op // an Op to reuse for all iterations
+	fms      []*Format    // reused slice for the the Formatter types defined for each Op
+	o        Op           // an Op to reuse for all iterations
 }
 
-// addFmTer adds the format from fmTer to fms if the format is not already set on fs. All FormatWrapper formats are added regardless
-// of whether they are already set on fs. Data is written to the temporary buffer only.
+// addFmTer adds the format from fmTer to fms (the temporary, current Op's formats) if the format is not already set in the
+// current format state. All FormatWrapper formats are added regardless of whether they are already set on fs. Data is written
+// to the temporary buffer only.
 func (o *Op) addFmTer(vars *renderVars, fmTer Formatter) {
 	if fmTer == nil {
 		return
@@ -121,10 +123,11 @@ func (o *Op) addFmTer(vars *renderVars, fmTer Formatter) {
 		fm.wrap = true
 		fm.wrapPre, fm.wrapPost = fw.Wrap()
 		vars.fms = append(vars.fms, fm)
-	} else if !vars.fs.hasSet(fmTer.Fmt()) {
+		return
+	}
+	if !vars.fs.hasSet(fmTer.Fmt()) {
 		vars.fms = append(vars.fms, fm)
 	}
-	return
 }
 
 // An Op is a Delta insert operations (https://github.com/quilljs/delta#insert) that has been converted into this format for
