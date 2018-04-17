@@ -112,20 +112,22 @@ func (fs *formatState) Len() int { return len(*fs) }
 
 func (fs *formatState) Less(i, j int) bool {
 
+	fsi, fsj := (*fs)[i], (*fs)[j]
+
 	// Formats that implement the FormatWrapper interface are written first.
-	if _, ok := (*fs)[i].fm.(FormatWrapper); ok {
+	if _, ok := fsi.fm.(FormatWrapper); ok {
 		return true
-	} else if _, ok := (*fs)[j].fm.(FormatWrapper); ok {
+	} else if _, ok := fsj.fm.(FormatWrapper); ok {
 		return false
 	}
 
 	// Tags are written first, then classes, and then style attributes.
-	if (*fs)[i].Place != (*fs)[j].Place {
-		return (*fs)[i].Place < (*fs)[j].Place
+	if fsi.Place != fsj.Place {
+		return fsi.Place < fsj.Place
 	}
 
 	// Simply check values.
-	return (*fs)[i].Val < (*fs)[j].Val
+	return fsi.Val < fsj.Val
 
 }
 

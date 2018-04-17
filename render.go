@@ -31,9 +31,9 @@ func RenderExtended(ops []byte, customFormats func(string, *Op) Formatter) ([]by
 	}
 
 	vars := renderVars{
-		o:   Op{Attrs: make(map[string]string, 3)},
 		fs:  make(formatState, 0, 4),
 		fms: make([]*Format, 0, 4),
+		o:   Op{Attrs: make(map[string]string, 3)},
 	}
 
 	for i := range raw {
@@ -56,7 +56,7 @@ func RenderExtended(ops []byte, customFormats func(string, *Op) Formatter) ([]by
 			vars.o.addFmTer(&vars, vars.o.getFormatter(attr, customFormats))
 		}
 
-		// Open the a block element, write its body, and close it to move on only when the ending "\n" of the block is reached.
+		// Open a block element, write its body, and close it to move on only when the ending "\n" of the block is reached.
 		if strings.IndexByte(vars.o.Data, '\n') != -1 {
 
 			// Extract text from between the block-terminating line feeds and write each part as its own Op.
