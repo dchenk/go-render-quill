@@ -396,11 +396,11 @@ func blankOp() *Op {
 
 // If cl has something, then classesList returns the class attribute to add to an HTML element with a space before the
 // "class" attribute and spaces between each class name.
-func classesList(cl []string) (classAttr string) {
+func classesList(cl []string) string {
 	if len(cl) > 0 {
-		classAttr = " class=" + strconv.Quote(strings.Join(cl, " "))
+		return " class=" + strconv.Quote(strings.Join(cl, " "))
 	}
-	return
+	return ""
 }
 
 // closeTag writes a complete closing tag to buf.
