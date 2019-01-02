@@ -99,15 +99,13 @@ func (imf *imageFormat) HasFormat(o *Op) bool {
 
 // imageFormat implements the FormatWriter interface.
 func (imf *imageFormat) Write(buf io.Writer) {
-
-	buf.Write([]byte("<img src="))
-	buf.Write([]byte(strconv.Quote(imf.src)))
+	io.WriteString(buf, "<img src=")
+	io.WriteString(buf, strconv.Quote(imf.src))
 	if imf.alt != "" {
-		buf.Write([]byte(" alt="))
-		buf.Write([]byte(strconv.Quote(imf.alt)))
+		io.WriteString(buf, " alt=")
+		io.WriteString(buf, strconv.Quote(imf.alt))
 	}
 	buf.Write([]byte{'>'})
-
 }
 
 // strikethrough

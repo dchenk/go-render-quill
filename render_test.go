@@ -9,9 +9,9 @@ import (
 func TestSimple(t *testing.T) {
 
 	cases := []string{
-		`[{"insert": "\n"}]`,                                                                                             // blank
-		`[{"insert": "line1\nline2\n"}]`,                                                                                 // two paragraphs (single op)
-		`[{"insert": "line1\n\nline3\n"}]`,                                                                               // blank line
+		`[{"insert": "\n"}]`,               // blank
+		`[{"insert": "line1\nline2\n"}]`,   // two paragraphs (single op)
+		`[{"insert": "line1\n\nline3\n"}]`, // blank line
 		`[{"insert": "bkqt"}, {"attributes": {"blockquote": true}, "insert": "\n"}]`,                                     // blockquote
 		`[{"attributes": {"color": "#a10000"}, "insert": "colored"}, {"insert": "\n"}]`,                                  // color
 		`[{"attributes":{"strike":true},"insert":"striked"},{"insert":"\n"}]`,                                            // strikethrough
@@ -59,26 +59,28 @@ func TestRender(t *testing.T) {
 	pairNames := []string{"ops1", "nested", "ordering", "list1", "list2", "list3", "list4", "indent", "code1", "code2"}
 
 	for _, n := range pairNames {
+		t.Run(n, func(t *testing.T) {
 
-		ops, err := ioutil.ReadFile("./testdata/" + n + ".json")
-		if err != nil {
-			t.Fatalf("could not read %s.json; %s", n, err)
-		}
+			ops, err := ioutil.ReadFile("./testdata/" + n + ".json")
+			if err != nil {
+				t.Fatalf("could not read %s.json; %s", n, err)
+			}
 
-		html, err := ioutil.ReadFile("./testdata/" + n + ".html")
-		if err != nil {
-			t.Fatalf("could not read %s.html; %s", n, err)
-		}
+			html, err := ioutil.ReadFile("./testdata/" + n + ".html")
+			if err != nil {
+				t.Fatalf("could not read %s.html; %s", n, err)
+			}
 
-		got, err := Render(ops)
-		if err != nil {
-			t.Errorf("error rendering; %s", err)
-		}
+			got, err := Render(ops)
+			if err != nil {
+				t.Errorf("error rendering; %v", err)
+			}
 
-		if !bytes.Equal(html, got) {
-			t.Errorf("bad rendering (name: %s):\nwanted: \n%s\ngot: \n%s", n, html, got)
-		}
+			if !bytes.Equal(html, got) {
+				t.Errorf("bad rendering:\nwanted: \n%s\ngot: \n%s", html, got)
+			}
 
+		})
 	}
 
 }
