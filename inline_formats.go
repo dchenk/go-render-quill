@@ -138,6 +138,20 @@ func (bf *bkgFormat) HasFormat(o *Op) bool {
 	return o.Attrs["background"] == bf.c
 }
 
+// sizeFormat is used for inline strings of named sizes such as "huge" or "small".
+type sizeFormat string
+
+func (sf sizeFormat) Fmt() *Format {
+	return &Format{
+		Val:   "ql-size-" + string(sf),
+		Place: Class,
+	}
+}
+
+func (sf sizeFormat) HasFormat(o *Op) bool {
+	return o.Attrs["size"] == string(sf)
+}
+
 // script (sup and sub)
 
 type scriptFormat struct {

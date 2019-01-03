@@ -315,6 +315,8 @@ func (o *Op) getFormatter(keyword string, customFormats func(string, *Op) Format
 		}
 	case "bold":
 		return new(boldFormat)
+	case "size":
+		return sizeFormat(o.Attrs["size"])
 	case "italic":
 		return new(italicFormat)
 	case "underline":

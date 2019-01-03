@@ -29,6 +29,7 @@ fmt.Println(string(html))
  - Text color
  - Italic
  - Link
+ - Size
  - Strikethrough
  - Superscript/Subscript
  - Underline

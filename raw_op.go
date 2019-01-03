@@ -6,8 +6,11 @@ import (
 )
 
 type rawOp struct {
-	Insert interface{}            `json:"insert"`
-	Attrs  map[string]interface{} `json:"attributes"`
+	// Insert is the string containing the data.
+	Insert interface{} `json:"insert"`
+
+	// Attrs contains the "attributes" property of the op.
+	Attrs map[string]interface{} `json:"attributes"`
 }
 
 // makeOp takes a raw Delta op as extracted from the JSON and turns it into an Op to make it usable for rendering.
@@ -42,7 +45,8 @@ func (ro *rawOp) makeOp(o *Op) error {
 	}
 
 	if ro.Attrs != nil {
-		for attr := range ro.Attrs { // the map was already made
+		// The map was already made
+		for attr := range ro.Attrs {
 			o.Attrs[attr] = extractString(ro.Attrs[attr])
 		}
 	}
