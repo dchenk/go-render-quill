@@ -89,7 +89,7 @@ func TestSimple(t *testing.T) {
 
 func TestRender(t *testing.T) {
 
-	pairNames := []string{"ops1", "nested", "ordering", "list1", "list2", "list3", "list4", "indent", "code1", "code2"}
+	pairNames := []string{"ops1", "nested", "ordering", "list1", "list2", "list3", "list4", "indent", "code1", "code2", "code3"}
 
 	for _, n := range pairNames {
 		t.Run(n, func(t *testing.T) {

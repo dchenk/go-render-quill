@@ -1,0 +1,14 @@
+[
+	{
+		"insert": "<tag>x</tag>"
+	},
+	{
+		"insert": "\n",
+		"attributes": {
+			"code-block": true
+		}
+	},
+	{
+		"insert": "Stuff after code\n"
+	}
+]
