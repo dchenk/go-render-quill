@@ -2,6 +2,7 @@ package quill
 
 import (
 	"fmt"
+	"html"
 	"strconv"
 )
 
@@ -24,7 +25,7 @@ func (ro *rawOp) makeOp(o *Op) error {
 	case string:
 		// This op is a simple string insert.
 		o.Type = "text"
-		o.Data = ins
+		o.Data = html.EscapeString(ins)
 	case map[string]interface{}:
 		if len(ins) == 0 {
 			return fmt.Errorf("op %+v lacks a non-text insert", *ro)
