@@ -1,4 +1,6 @@
-# go-render-quill [![Build Status](https://travis-ci.org/dchenk/go-render-quill.svg?branch=master)](https://travis-ci.org/dchenk/go-render-quill)
+# go-render-quill
+[![Build Status](https://travis-ci.org/dchenk/go-render-quill.svg?branch=master)](https://travis-ci.org/dchenk/go-render-quill)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fdchenk%2Fgo-render-quill.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fdchenk%2Fgo-render-quill?ref=badge_shield)
 
 Package `quill` takes a Quill-based Delta (https://github.com/quilljs/delta) as a JSON array of `insert` operations
 and renders the defined HTML document.
