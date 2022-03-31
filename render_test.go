@@ -15,7 +15,7 @@ func TestSimple(t *testing.T) {
 	}{
 		"empty": {
 			ops:  `[{"insert": "\n"}]`,
-			want: "<p><br></p>",
+			want: "<p><br/></p>",
 		},
 		"two paragraphs (single op)": {
 			ops:  `[{"insert": "line1\nline2\n"}]`,
@@ -23,7 +23,7 @@ func TestSimple(t *testing.T) {
 		},
 		"blank line": {
 			ops:  `[{"insert": "line1\n\nline3\n"}]`,
-			want: "<p>line1</p><p><br></p><p>line3</p>",
+			want: "<p>line1</p><p><br/></p><p>line3</p>",
 		},
 		"blockquote": {
 			ops:  `[{"insert": "bkqt"}, {"attributes": {"blockquote": true}, "insert": "\n"}]`,
