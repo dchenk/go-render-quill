@@ -211,7 +211,7 @@ func (o *Op) writeBlock(vars *renderVars) {
 
 	// Avoid empty paragraphs and "\n" in the output for text blocks.
 	if o.Data == "" && block.tagName == "p" && vars.tempBuf.Len() == 0 {
-		o.Data = "<br>"
+		o.Data = "<br/>"
 	}
 
 	if block.tagName != "" {
@@ -227,7 +227,7 @@ func (o *Op) writeBlock(vars *renderVars) {
 
 	vars.finalBuf.Write(vars.tempBuf.Bytes()) // Copy the temporary buffer to the final output.
 
-	vars.finalBuf.WriteString(o.Data) // Copy the data of the current Op (usually just "<br>" or blank).
+	vars.finalBuf.WriteString(o.Data) // Copy the data of the current Op (usually just "<br/>" or blank).
 
 	if block.tagName != "" {
 		closeTag(&vars.finalBuf, block.tagName)
