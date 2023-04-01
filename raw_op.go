@@ -34,6 +34,7 @@ func (ro *rawOp) makeOp(o *Op) error {
 		for mk := range ins {
 			o.Type = mk
 			o.Data = extractString(ins[mk])
+			o.DataMap = extractMap(ins[mk])
 			break
 		}
 	default:
@@ -68,4 +69,20 @@ func extractString(v interface{}) string {
 		return strconv.FormatFloat(val, 'f', 0, 64)
 	}
 	return ""
+}
+
+func extractMap(v interface{}) map[string]string {
+	switch val := v.(type) {
+	case map[string]interface{}:
+		newMap := make(map[string]string)
+		for key, value := range val {
+			if strValue, ok := value.(string); ok {
+				newMap[key] = strValue
+			} else {
+				newMap[key] = fmt.Sprint(value)
+			}
+		}
+		return newMap
+	}
+	return make(map[string]string)
 }
