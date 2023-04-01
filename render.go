@@ -133,9 +133,10 @@ func (o *Op) addFmTer(vars *renderVars, fmTer Formatter) {
 // An Op is a Delta insert operations (https://github.com/quilljs/delta#insert) that has been converted into this format for
 // usability with the type safety in Go.
 type Op struct {
-	Data  string            // the text to insert or the value of the embed object (http://quilljs.com/docs/delta/#embeds)
-	Type  string            // the type of the op (typically "text", but any other type can be registered)
-	Attrs map[string]string // key is attribute name; value is either the attribute value or "y" (meaning true)
+	Data    string // the text to insert or the value of the embed object (http://quilljs.com/docs/delta/#embeds)
+	DataMap map[string]string
+	Type    string            // the type of the op (typically "text", but any other type can be registered)
+	Attrs   map[string]string // key is attribute name; value is either the attribute value or "y" (meaning true)
 }
 
 // writeBlock writes a block element (which may be nested inside another block element if it is a FormatWrapper).
@@ -393,7 +394,7 @@ type Format struct {
 
 // A blankOp can be used to signal any FormatWrapper formats to write the final closing wrap.
 func blankOp() *Op {
-	return &Op{"", "text", make(map[string]string)}
+	return &Op{"", make(map[string]string), "text", make(map[string]string)}
 }
 
 // If cl has something, then classesList returns the class attribute to add to an HTML element with a space before the
