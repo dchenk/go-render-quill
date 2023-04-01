@@ -36,6 +36,9 @@ func RenderExtended(ops []byte, customFormats func(string, *Op) Formatter) ([]by
 		o:   Op{Attrs: make(map[string]string, 3)},
 	}
 
+	raw = append(raw, rawOp{
+		Insert: "\n",
+	})
 	for i := range raw {
 
 		if err := raw[i].makeOp(&vars.o); err != nil {
